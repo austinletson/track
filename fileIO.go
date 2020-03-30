@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -12,54 +11,24 @@ const (
 	storageFile = "tasks.tt"
 )
 
-func WriteTasksToTaskFile(taskStamp TaskStartStamp) {
+func WriteTasksToTaskFile(taskRecords TaskRecords) {
 
-	taskName := taskStamp.Task.Name
-	var newRecord TaskRecords
-	var _, err = os.Stat(storageFile)
-	if err == nil {
-		previousRecord := ReadTasksFromTasksFile()
-		if previousRecord == nil {
-			previousRecord = make(map[string][]TaskStartStamp)
-		}
-		if previousRecord[taskStamp.Task.Name] == nil {
-			// Add a new stamp list
-			previousRecord[taskName] = []TaskStartStamp{taskStamp}
-		} else {
-			// Add the stamp to the old list
-			oldList := previousRecord[taskName]
-			previousRecord[taskName] = append(oldList, taskStamp)
-		}
-		newRecord.Record = previousRecord
-		err = os.Remove(storageFile)
-		isError(err)
-	} else {
-		fmt.Print("Generating tasks file...")
-		mapRecord := make(map[string][]TaskStartStamp)
-		mapRecord[taskStamp.Task.Name] = []TaskStartStamp{taskStamp}
-		newRecord.Record = mapRecord
-
-	}
+	err := os.Remove(storageFile)
+	isError(err)
 
 	file, err := os.Create(storageFile)
 	isError(err)
 	defer file.Close()
 
-	formattedTask, err := yaml.Marshal(newRecord)
+	formattedTask, err := yaml.Marshal(taskRecords)
 	isError(err)
-
-	//	writer := bufio.NewWriter(file)
-	//	_, err = writer.Write(formattedTask)
-	//	isError(err)
-	//err = writer.Flush()
-	//	isError(err)
 
 	err = ioutil.WriteFile(storageFile, formattedTask, 0644)
 	isError(err)
 }
 
 // Read tasks edn from file and return them
-func ReadTasksFromTasksFile() map[string][]TaskStartStamp {
+func ReadTasksFromTasksFile() TaskRecords {
 	file, err := os.Open(storageFile)
 	isError(err)
 	defer file.Close()
@@ -68,10 +37,10 @@ func ReadTasksFromTasksFile() map[string][]TaskStartStamp {
 	bytes, err = ioutil.ReadAll(file)
 	isError(err)
 
-	var stampsList TaskRecords
-	err = yaml.Unmarshal(bytes, &stampsList)
+	var taskRecords TaskRecords
+	err = yaml.Unmarshal(bytes, &taskRecords)
 	isError(err)
-	return stampsList.Record
+	return taskRecords
 }
 
 func setTasksFile(newTaskFile string) {

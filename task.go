@@ -11,13 +11,15 @@ const (
 	END   = 0
 )
 
+var NIL_TIME time.Time = time.Time{}
+
 type Task struct {
-	Name     string
-	Priority int
+	Name          string
+	Priority      int
+	TaskIntervals []TaskInterval
 }
 
 type TaskInterval struct {
-	Task      Task
 	StartTime time.Time
 	EndTime   time.Time
 }
@@ -33,54 +35,76 @@ type TaskEndStamp struct {
 }
 
 type TaskRecords struct {
-	Record map[string][]TaskStartStamp
+	Record map[string]*Task
 }
 
 var activeTasks = make([]Task, 0)
 
+func makeTask(name string, priority int) (task Task) {
+
+	task = Task{
+		Name:          name,
+		Priority:      priority,
+		TaskIntervals: nil,
+	}
+	return task
+}
+
 // Function to start a task and write it to file
 func clockIn(taskValue Task, timeStampValue time.Time) error {
-	for _, task := range getActiveTasks() {
-		if task.Name == taskValue.Name {
+	taskRecords := ReadTasksFromTasksFile()
+
+	if taskRecords.Record == nil {
+		taskRecords.Record = make(map[string]*Task)
+	}
+	taskExistsInRecord := false
+	if task, ok := taskRecords.Record[taskValue.Name]; ok {
+		lastInterval := task.TaskIntervals[len(task.TaskIntervals)-1]
+		if lastInterval.EndTime == NIL_TIME {
 			return errors.New("Task already active")
 		}
+		newInterval := TaskInterval{
+			StartTime: time.Now(),
+			EndTime:   NIL_TIME,
+		}
+		task.TaskIntervals = append(task.TaskIntervals, newInterval)
+		fmt.Print(task.TaskIntervals)
+		taskExistsInRecord = true
+
 	}
 
-	taskStamp := TaskStartStamp{
-		Task:       taskValue,
-		TimeStamp:  time.Now(),
-		StartOrEnd: START,
+	if !taskExistsInRecord {
+		taskInterval := TaskInterval{
+			StartTime: timeStampValue,
+			EndTime:   NIL_TIME,
+		}
+		taskValue.TaskIntervals = append(taskValue.TaskIntervals, taskInterval)
+		taskRecords.Record[taskValue.Name] = &taskValue
 	}
 
-	fmt.Print(taskStamp)
-	WriteTasksToTaskFile(taskStamp)
+	WriteTasksToTaskFile(taskRecords)
 	return nil
 }
 
 // Mabeu consolidate this function
 // Function to end a task that has already been started
+// TODO figure out weird behavior with task lastInterval
 func clockOut(taskName string, timeStampValue time.Time) error {
-	for _, task := range getActiveTasks() {
-		if task.Name == taskName {
-			taskStamp := TaskStartStamp{
-				Task: Task{
-					Name:     taskName,
-					Priority: 0,
-				},
-				TimeStamp:  timeStampValue,
-				StartOrEnd: END,
-			}
+	taskRecords := ReadTasksFromTasksFile()
+	task := taskRecords.Record[taskName]
+	if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime == NIL_TIME {
 
-			WriteTasksToTaskFile(taskStamp)
-			return nil
-		}
+		task.TaskIntervals[len(task.TaskIntervals)-1].EndTime = time.Now()
+		WriteTasksToTaskFile(taskRecords)
+		return nil
 	}
 	return errors.New("Task is not active")
 }
 
 // Function to lists active tasks
-func listTasks(tasksStamps map[string][]TaskStartStamp) {
-	for _, task := range getActiveTasks() {
+// Maybe consolidate with get active tasks
+func listTasks(taskRecords TaskRecords) {
+	for _, task := range getActiveTasks(taskRecords) {
 		fmt.Print(task.Name)
 	}
 }
@@ -88,12 +112,12 @@ func listTasks(tasksStamps map[string][]TaskStartStamp) {
 // Helper methods
 
 // Gets all tasks that are most recent and have tag START
-func getActiveTasks() (activeTasks []Task) {
-	taskRecord := ReadTasksFromTasksFile()
-	for _, taskStamps := range taskRecord {
-		if len(taskStamps) != 0 && taskStamps[len(taskStamps)-1].StartOrEnd == START {
-			activeTasks = append(activeTasks, taskStamps[len(taskStamps)-1].Task)
+func getActiveTasks(taskRecords TaskRecords) (activeTasks []Task) {
+	for _, task := range taskRecords.Record {
+		if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime == NIL_TIME {
+			activeTasks = append(activeTasks, *task)
 		}
+
 	}
 	return activeTasks
 }

@@ -10,20 +10,14 @@ var goalTasks []string
 func main() {
 	startName, list, endName, priority := readArgs()
 
-	fmt.Print("Gotinto main")
 	if startName != nil {
-		fmt.Print("got into start")
 		var priorityValue int
 		if priority != nil {
 			priorityValue = *priority
 		} else {
 			priorityValue = 0
 		}
-		task := Task{
-			Name:     *startName,
-			Priority: priorityValue,
-		}
-		err := clockIn(task, time.Now())
+		err := clockIn(makeTask(*startName, priorityValue), time.Now())
 		fmt.Println(err)
 		if err != nil {
 			fmt.Println(err)
