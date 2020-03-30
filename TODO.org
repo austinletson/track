@@ -1,0 +1,10 @@
+Features for Track 
+* Features
+** Plain text tasks storage
+** Default categories (rest, excersize)
+** Daily report of what tasks were accomplished with what programs were
+running 
+** Clock in clock out style task management use daemon
+* Stretch
+** Integration with org mode
+** Notifications
