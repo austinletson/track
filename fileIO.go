@@ -8,8 +8,10 @@ import (
 )
 
 const (
-	storageFile = "tasks.tt"
+	configDirPath = "~/.config/track/"
 )
+
+var storageFile string = "tasks.tt"
 
 func WriteTasksToTaskFile(taskRecords TaskRecords) {
 
@@ -44,7 +46,7 @@ func ReadTasksFromTasksFile() TaskRecords {
 }
 
 func setTasksFile(newTaskFile string) {
-	tasksFile = newTaskFile
+	storageFile = newTaskFile
 }
 
 const (

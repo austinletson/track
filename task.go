@@ -34,6 +34,7 @@ type TaskEndStamp struct {
 	TimeStamp time.Time
 }
 
+// TODO try and simplify this to one type
 type TaskRecords struct {
 	Record map[string]*Task
 }
@@ -99,14 +100,6 @@ func clockOut(taskName string, timeStampValue time.Time) error {
 		return nil
 	}
 	return errors.New("Task is not active")
-}
-
-// Function to lists active tasks
-// Maybe consolidate with get active tasks
-func listTasks(taskRecords TaskRecords) {
-	for _, task := range getActiveTasks(taskRecords) {
-		fmt.Print(task.Name)
-	}
 }
 
 // Helper methods
