@@ -50,7 +50,6 @@ func readArgs() {
 func noneAreSetBut(setFlags []string) bool {
 	noneAreSet := true
 	flag.Visit(func(f *flag.Flag) {
-		fmt.Print(f.Name)
 		if !containsString(f.Name, setFlags) {
 			noneAreSet = false
 		}
