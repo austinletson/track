@@ -1,10 +1,33 @@
 Features for Track 
-* Features
-** Plain text tasks storage
-** Default categories (rest, excersize)
-** Daily report of what tasks were accomplished with what programs were
-running 
-** Clock in clock out style task management use daemon
+* Features for version 0.1.0
+** TODO Categories
+*** TODO Default categories (rest, excersize)
+*** TODO Choose by category on graph
+** Reports
+*** TODO Reports (One task, All tasks, Categories)
+*** TODO Invoice on reports
+** TODO Use track for  day
+** TODO Allow piping of arbitrary text into Track
+** TODO Generate better commandline help
+*** TODO Gantt
+*** TODO List
+** TODO Add suport for time command (when combined)
+** TODO Research Cobra
+* Next Version
+** TODO Choose time period for graph
+*** Make chart reports max daily
+** TODO Alaises
+** Impliment config file (maybe with viper)
+** Streams
+*** Add pause command with allows you to pause ocmmands in a stream until is
+      done
+*** Add streams where only one task of a certain type can run at a time
 * Stretch
-** Integration with org mode
-** Notifications
+** TODO Auto Complete
+** TODO Integration with org mode
+** TODO Guess categories based on task name
+** TODO Notifications
+* Done
+** DONE Integrate priority into display
+** DONE Plain text tasks storage
+** DONE Create graph layout

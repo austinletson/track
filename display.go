@@ -14,52 +14,133 @@ import (
 const (
 	timeLayout  = "15:04"
 	_TIOCGWINSZ = 0x5413
+
+	justActiveTasks = 0
+	allTasks        = 1
+
+	verbose    = 0
+	notVerbose = 1
 )
 
-func generateBasicDisplay(records TaskRecords) (chart string) {
+func listTasks(taskRecords TaskRecords, allOrActive int, verboseOrNot int) (taskString string) {
+	var tasks []Task
+	if allOrActive == justActiveTasks {
+		tasks = getActiveTasks(taskRecords)
+	} else {
+		for _, task := range taskRecords.Record {
+			tasks = append(tasks, *task)
+		}
+	}
 
-	for _, task := range records.Record {
-		namePrefix := fmt.Sprintf("[%v]", task.Name)
+	if verboseOrNot == notVerbose {
+		for _, task := range tasks {
+			taskString = taskString + task.Name + "\n"
+		}
+	} else {
+		taskString = generateBasicReport(tasks)
+	}
 
-		startTime := task.TaskIntervals[0].StartTime.Format(timeLayout)
-		endTime := task.TaskIntervals[0].EndTime.Format(timeLayout)
+	return taskString
+}
+
+// Generate text report of all tasks
+func generateBasicReport(tasks []Task) (report string) {
+
+	// Agregate all time and calculate maxNameLength
+	maxNameLength := 0
+	for _, task := range tasks {
+		if len(task.Name) > maxNameLength {
+			maxNameLength = len(task.Name)
+		}
+
+	}
+
+	for _, task := range tasks {
+		var namePrefix string
+		if task.Priority != 0 {
+			namePrefix = Bold(fmt.Sprintf("[%v %v]", task.Name, task.Priority))
+		} else {
+			namePrefix = Bold(fmt.Sprintf("[%v]", task.Name))
+		}
 
 		var timeString string
-		if task.TaskIntervals[0].EndTime == NIL_TIME {
-			timeString = fmt.Sprintf("%v ---->", startTime)
-		} else {
-			timeString = fmt.Sprintf("%v -- %v", startTime, endTime)
+		firstOne := true
+		for _, interval := range task.TaskIntervals {
+			startTime := interval.StartTime.Format(timeLayout)
+			endTime := interval.EndTime.Format(timeLayout)
+
+			if firstOne {
+				timeString = generateCharacters(" ", maxNameLength-len(task.Name))
+				firstOne = false
+			} else {
+				// +2 for two brackets and -4 to make it less indented
+				timeString = timeString + generateCharacters(" ", maxNameLength+2-4)
+			}
+			if interval.EndTime == NIL_TIME {
+				// TODO make this not specific to the current time format
+				timeString += color.New(color.FgGreen).Sprintf("%v ------->\n", startTime)
+			} else {
+				timeString += fmt.Sprintf("%v -- %v\n", startTime, endTime)
+			}
+
 		}
 
 		lineString := fmt.Sprintf("%v %v\n", namePrefix, timeString)
-		chart = chart + lineString
+		report = report + lineString
 
 	}
-	return chart
+	return report
 
 }
+
 func generateGanttChart(records TaskRecords) (chart string) {
 
+	// Agregate all time and calculate maxNameLength
+	maxNameLength := 4 // 4 because the header "TASK" has 4 chars
 	var allTimes []time.Time
-	maxNameLength := 0
-	ganttGraphLength := TerminalWidth() - 20
-
-	for _, record := range records.Record {
-		for _, interval := range record.TaskIntervals {
+	anyHavePriority := false
+	for _, task := range records.Record {
+		for _, interval := range task.TaskIntervals {
 			allTimes = append(allTimes, interval.StartTime, interval.EndTime)
 		}
-		if len(record.Name) > maxNameLength {
-			maxNameLength = len(record.Name)
+		if len(task.Name) > maxNameLength {
+			maxNameLength = len(task.Name)
+		}
+		if task.Priority != 0 {
+			anyHavePriority = true
 		}
 
 	}
-	minTime, maxTime := timeSpan(allTimes)
 
-	totalLength := ganttGraphLength + maxNameLength + 3
-	chart = generateChartHeader(minTime, maxTime, totalLength)
+	ganttGraphLength := TerminalWidth() - maxNameLength - 10
+	minTime, maxTime, containsActiveTask := timeSpan(allTimes)
+
+	// If there is an active task extend the max time to show activity
+	if containsActiveTask {
+		oneAndOneFourthTimeInterval := time.Unix(maxTime.Unix()+(maxTime.Unix()-minTime.Unix())/4, 0)
+		if time.Now().Unix() < maxTime.Unix() {
+			maxTime = time.Now()
+		} else {
+			maxTime = oneAndOneFourthTimeInterval
+		}
+	}
+
+	var headShift int
+	if anyHavePriority {
+		headShift = 6
+	} else {
+		headShift = 4
+	}
+	//totalLength := ganttGraphLength + maxNameLength + headShift
+	chart = ""
 
 	for _, task := range records.Record {
-		lineString := Bold(fmt.Sprintf(" %v: %v", task.Name, generateCharacters(" ", maxNameLength-len(task.Name))))
+		var lineString string
+		if task.Priority == 0 {
+			lineString = Bold(fmt.Sprintf(" [%v] %v", task.Name, generateCharacters(" ", maxNameLength-len(task.Name))))
+		} else {
+			lineString = Bold(fmt.Sprintf(" [%v %v] %v", task.Name, task.Priority, generateCharacters(" ", maxNameLength-len(task.Name))))
+		}
 		previousEnd := -1
 		for _, interval := range task.TaskIntervals {
 			startTime := interval.StartTime
@@ -75,24 +156,36 @@ func generateGanttChart(records TaskRecords) (chart string) {
 				scaledLocationOfEnd = fractionOfTimeRange(endTime, minTime, maxTime, ganttGraphLength)
 			}
 
+			// Edge case where a small interval(*) is close to another interval
+			// TODO fix bug that this isn't cyan
+			if scaledLocationOfStart == previousEnd {
+				lineString = lineString[:len(lineString)-1]
+				lineString += "|"
+			}
+
 			currentChar := " "
 			for i := previousEnd + 1; i <= scaledLocationOfEnd; i++ {
 				if i == scaledLocationOfEnd && isActive {
 					currentChar = color.New(color.FgCyan).Add(color.Bold).Sprint(">")
-				} else if i == scaledLocationOfStart && i == 0 {
-					currentChar = "|"
 				} else if i == scaledLocationOfStart && scaledLocationOfStart == scaledLocationOfEnd {
 					currentChar = "*"
+				} else if i == scaledLocationOfStart && i == 0 {
+					currentChar = color.New(color.FgCyan).Add(color.Bold).Sprint("|")
 				} else if i == scaledLocationOfStart || i == scaledLocationOfEnd {
 					currentChar = color.New(color.FgCyan).Add(color.Bold).Sprint("|")
 				} else if i > scaledLocationOfStart && i < scaledLocationOfEnd {
-					currentChar = color.New(color.FgHiRed).Add(color.Bold).Sprint("=")
+					if isActive {
+						currentChar = color.New(color.FgHiGreen).Add(color.Bold).Sprint("=")
+					} else {
+						currentChar = color.New(color.FgHiRed).Add(color.Bold).Sprint("=")
+					}
 				} else {
 					currentChar = " "
 				}
 				lineString += currentChar
 			}
 			previousEnd = scaledLocationOfEnd
+
 		}
 
 		chart = chart + lineString + "\n"
@@ -102,9 +195,15 @@ func generateGanttChart(records TaskRecords) (chart string) {
 
 	}
 	//footer := "#" + generateCharacters("#", totalLength-2) + "#"
-	//	chart = chart + footer
-	return Bold(chart)
+	//	chart = chart + foot
+	shiftedHeader := " " + generateLogo() + generateCharacters(" ", maxNameLength+headShift-13) + generateChartHeader(minTime, maxTime, ganttGraphLength)
+	return shiftedHeader + Bold(chart)
 
+}
+
+func generateLogo() (logo string) {
+	logo = color.New(color.FgBlack, color.BgHiWhite).Sprint(Bold("===")) + color.New(color.FgHiRed, color.BgHiWhite).Sprint((Bold("track"))) + color.New(color.FgBlack, color.BgHiWhite).Sprint(Bold("==="))
+	return logo
 }
 
 func generateChartHeader(startTime time.Time, endTime time.Time, width int) (headerString string) {
@@ -124,7 +223,7 @@ func generateChartHeader(startTime time.Time, endTime time.Time, width int) (hea
 	firstChars := generateCharacters("-", firstThirdOfCharacters)
 	secondAndThirdChars := generateCharacters("-", secondAndThirdOfCharacters)
 
-	headerString = fmt.Sprintf(" %v %v %v %v %v %v %v %v %v \n", startTime.Format(timeLayout), firstChars, fourthWayTime, secondAndThirdChars, halfWayTime, secondAndThirdChars, threeFourthsWayTime, secondAndThirdChars, endTime.Format(timeLayout))
+	headerString = fmt.Sprintf("%v %v %v %v %v %v %v %v %v \n", startTime.Format(timeLayout), firstChars, fourthWayTime, secondAndThirdChars, halfWayTime, secondAndThirdChars, threeFourthsWayTime, secondAndThirdChars, endTime.Format(timeLayout))
 
 	return headerString
 }
@@ -137,17 +236,19 @@ func generateCharacters(character string, count int) (characters string) {
 }
 
 // Return min and max of slice of times
-func timeSpan(times []time.Time) (min time.Time, max time.Time) {
+func timeSpan(times []time.Time) (min time.Time, max time.Time, containsNileTime bool) {
 	min = times[0]
 	max = times[0]
 	for _, time := range times {
-		if time.Before(min) && time.After(NIL_TIME) {
+		if time == NIL_TIME {
+			containsNileTime = true
+		} else if time.Before(min) {
 			min = time
 		} else if time.After(max) {
 			max = time
 		}
 	}
-	return min, max
+	return min, max, containsNileTime
 }
 
 // Returns the scalled numerator of how far between max and min the middle time lies

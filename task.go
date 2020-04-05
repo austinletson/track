@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -69,7 +68,6 @@ func clockIn(taskValue Task, timeStampValue time.Time) error {
 			EndTime:   NIL_TIME,
 		}
 		task.TaskIntervals = append(task.TaskIntervals, newInterval)
-		fmt.Print(task.TaskIntervals)
 		taskExistsInRecord = true
 
 	}

@@ -16,7 +16,7 @@ func main() {
 	//	function: func(params []*flag.Flag) { fmt.Println("asdfsadfworkd") },
 	//}
 	//commands := []Command{startCommand, startAndPriorityCommand, endCommand}
-	readArgs()
+	readArgsTest()
 }
 
 //func main() {

@@ -1,0 +1,7 @@
+Bugs to be fixed to stay on Track
+* Critical
+** Fix non existant file errors
+* Secondaary
+** Gantt chart
+*** Non bold/cyan pipe on Gantt chart edge case
+*** Handle edge case with short intervals gracefully
