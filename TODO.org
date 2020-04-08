@@ -1,33 +1,56 @@
 Features for Track 
 * Features for version 0.1.0
-** TODO Categories
-*** TODO Default categories (rest, excersize)
-*** TODO Choose by category on graph
-** Reports
-*** TODO Reports (One task, All tasks, Categories)
-*** TODO Invoice on reports
-** TODO Use track for  day
-** TODO Allow piping of arbitrary text into Track
-** TODO Generate better commandline help
-*** TODO Gantt
-*** TODO List
-** TODO Add suport for time command (when combined)
-** TODO Research Cobra
+** Tags (task.go)
+*** DONE Basic tags
+*** Choose by category on list
+** Allow support for starting multiple tasks at a time
+** Allow piping of arbitrary text into Track (fileIO.go)
+** Generate better commandline help (cmd/)
+*** Gantt
+*** List
+** Sort entries in display functions by something
+** Impliment Cobra (cmd/)
+*** DONE Initial implimentation
+*** Fill in help messages
+*** Make sure safe input
+** Clean up display.go
+** Clean up task.go
+** Change the display of time in the yaml file
 * Next Version
-** TODO Choose time period for graph
+** Choose time period for graph and list
 *** Make chart reports max daily
-** TODO Alaises
+** Make a command to open your config file in your editor
+** Allow for different time formats
+** Make all errors elegant
+** Reports (reports.go)
+*** Reports (One task, All tasks, Categories)
+*** Invoice on reports
+** Add "task" command to edit the properties of an existing task
+** Change end command to "stop"?
+** Add support for finishing tasks
+** Add switch command with automaticlaly switches from one task to another
+** Create hierarchy of tasks where there is a main task and then subtasks
+** Allow user to enter tasks before they start them
+** Default tags(rest, excersize)
+** Alaises
 ** Impliment config file (maybe with viper)
-** Streams
-*** Add pause command with allows you to pause ocmmands in a stream until is
-      done
+** Stream
+*** Add pause command with allows you to pause ocmmands in a stream until is done
 *** Add streams where only one task of a certain type can run at a time
+*** Starting a task in a stream ends another command
+*** Maybe there always has to be a task running
+** Make hierarchy of tasks (for instance if I am working on track then I am
+(working on my computer ). This could maybe be a special type of tag
+** Add task file to configuration and make it available anywhere
+** End --all
 * Stretch
-** TODO Auto Complete
-** TODO Integration with org mode
-** TODO Guess categories based on task name
-** TODO Notifications
+** Auto Complete (cmd)
+** Integration with org mode (unknown package)
+** Guess categories based on task name (task)
+** Notifications (unknown package)
 * Done
+** DONE Use track for day
+** DONE Add suport for time command (when combined) (task.go)
 ** DONE Integrate priority into display
 ** DONE Plain text tasks storage
 ** DONE Create graph layout

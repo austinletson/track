@@ -1,7 +1,16 @@
 Bugs to be fixed to stay on Track
 * Critical
-** Fix non existant file errors
-* Secondaary
+** Fix timeline for Gantt chart so that it goes to present time if there is an on going task
+** Eleminate extended space for active tasks on gantt chart
+** Fix Gantt chart so that all the elements line up
+** Crash when trying to end a task that doesn't exist
+* Secondary
 ** Gantt chart
 *** Non bold/cyan pipe on Gantt chart edge case
 *** Handle edge case with short intervals gracefully
+*** Order of display for list and chart
+** Add ability to start and end tasks between previous tasks
+** That command is not active vs that command does not exist (list command
+errors)
+* Done
+** DONE Fix non existant file errors
