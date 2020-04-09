@@ -18,7 +18,7 @@ const (
 	_TIOCGWINSZ = 0x5413
 )
 
-func ListTasks(taskRecords TaskRecords, allOrActive bool, verboseOrNot bool) (taskString string) {
+func ListTasks(taskRecords TaskRecords, allOrActive bool, verboseOrNot bool, tags []string) (taskString string) {
 	var tasks []Task
 
 	if reflect.DeepEqual(taskRecords, NIL_RECORDS) {
@@ -31,7 +31,20 @@ func ListTasks(taskRecords TaskRecords, allOrActive bool, verboseOrNot bool) (ta
 	} else {
 		tasks = GetActiveTasks(taskRecords)
 	}
-
+	// Filter out tasks that don't contain the tags
+	if len(tags) != 0 {
+		taggedTasks := []Task{}
+		for _, task := range tasks {
+			for _, tag := range task.Tags {
+				for _, givenTag := range tags {
+					if tag == givenTag && !containsTask(taggedTasks, task) {
+						taggedTasks = append(taggedTasks, task)
+					}
+				}
+			}
+		}
+		tasks = taggedTasks
+	}
 	if verboseOrNot {
 		taskString = generateBasicReport(tasks)
 	} else {

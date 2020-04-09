@@ -12,8 +12,12 @@ import (
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "Start a task",
-	Long:  "Starts a task at the current time by default",
+	Short: "Starts a task(s)",
+	Long: `Start is used to start a new or existing task or tasks. By default the task(s) starts at the current time, however the user can provide a time with the --time flag. Below are a few examples of what start can do:
+
+	task start bugs (starts a task called \"bugs\" at the current time)
+	task start mobile_research -t 15:35 (starts a task called \" mobile_research\" at 15:35)
+	task start bugs mobile_research (starts tasks \"bugs\" and \"mobile_research\" at the current time)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			fmt.Print(cmd.Usage())
@@ -30,10 +34,13 @@ var startCmd = &cobra.Command{
 		} else {
 			startTime = time.Now()
 		}
-		taskName := args[0]
-		tags := args[1:]
-		err := core.ClockIn(core.MakeTask(taskName, priorityFlag, tags), startTime)
-		if err != nil {
+		tasks := []core.Task{}
+		for _, taskName := range args {
+			tasks = append(tasks, core.MakeTask(taskName, priorityFlag, tagsFlag))
+		}
+		errs := core.ClockIn(tasks, startTime)
+
+		for _, err := range errs {
 			fmt.Println(err)
 		}
 	},
@@ -47,4 +54,5 @@ func init() {
 
 	startCmd.Flags().IntVarP(&priorityFlag, "priority", "p", 0, "Assign a priority to the given task")
 	startCmd.Flags().StringVarP(&timeFlagStart, "time", "t", "", "Change the start time of the given task")
+	//listCmd.Flags().StringSliceVarP(&tagsFlag, "tags", "t", nil, "Takes a list of the tags to attach to the given task.")
 }

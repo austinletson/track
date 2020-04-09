@@ -4,6 +4,7 @@ Bugs to be fixed to stay on Track
 ** Eleminate extended space for active tasks on gantt chart
 ** Fix Gantt chart so that all the elements line up
 ** Crash when trying to end a task that doesn't exist
+** Disallow starting the same tag twice
 * Secondary
 ** Gantt chart
 *** Non bold/cyan pipe on Gantt chart edge case
@@ -12,5 +13,6 @@ Bugs to be fixed to stay on Track
 ** Add ability to start and end tasks between previous tasks
 ** That command is not active vs that command does not exist (list command
 errors)
+** Disallow setting tags twice
 * Done
 ** DONE Fix non existant file errors

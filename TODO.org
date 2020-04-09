@@ -1,10 +1,6 @@
 Features for Track 
 * Features for version 0.1.0
-** Tags (task.go)
-*** DONE Basic tags
-*** Choose by category on list
-** Allow support for starting multiple tasks at a time
-** Allow piping of arbitrary text into Track (fileIO.go)
+** Allow support for starting and ending multiple tasks at a time
 ** Generate better commandline help (cmd/)
 *** Gantt
 *** List
@@ -19,7 +15,6 @@ Features for Track
 * Next Version
 ** Choose time period for graph and list
 *** Make chart reports max daily
-** Make a command to open your config file in your editor
 ** Allow for different time formats
 ** Make all errors elegant
 ** Reports (reports.go)
@@ -34,6 +29,7 @@ Features for Track
 ** Default tags(rest, excersize)
 ** Alaises
 ** Impliment config file (maybe with viper)
+*** Add task file to configuration and make it available anywhere
 ** Stream
 *** Add pause command with allows you to pause ocmmands in a stream until is done
 *** Add streams where only one task of a certain type can run at a time
@@ -41,14 +37,20 @@ Features for Track
 *** Maybe there always has to be a task running
 ** Make hierarchy of tasks (for instance if I am working on track then I am
 (working on my computer ). This could maybe be a special type of tag
-** Add task file to configuration and make it available anywhere
 ** End --all
+** Provide a -s flag to sort the list command by certain things (tag, time)
+** Support for deleting tasks
 * Stretch
+** Make a command to open your config file in your editor
 ** Auto Complete (cmd)
 ** Integration with org mode (unknown package)
 ** Guess categories based on task name (task)
 ** Notifications (unknown package)
 * Done
+** DONE Allow piping of arbitrary text into Track (fileIO.go)
+** DONE Tags (task.go)
+*** DONE Basic tags
+*** DONE Choose by category on list
 ** DONE Use track for day
 ** DONE Add suport for time command (when combined) (task.go)
 ** DONE Integrate priority into display
