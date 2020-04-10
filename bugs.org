@@ -1,10 +1,11 @@
 Bugs to be fixed to stay on Track
 * Critical
-** Fix timeline for Gantt chart so that it goes to present time if there is an on going task
-** Eleminate extended space for active tasks on gantt chart
-** Fix Gantt chart so that all the elements line up
-** Crash when trying to end a task that doesn't exist
-** Disallow starting the same tag twice
+** Disallow starting the same tag twice (or other weird tag behavior)
+** Gantt Chart
+*** Eleminate extended space for active tasks on gantt chart
+*** Fix Gantt chart so that all the elements line up
+*** Fix timeline for Gantt chart so that it goes to present time if there is an on going task
+*** When adding a new time interval that is before current time intervals, the interval doesnt showup on the report
 * Secondary
 ** Gantt chart
 *** Non bold/cyan pipe on Gantt chart edge case
@@ -16,4 +17,5 @@ errors)
 ** Disallow setting tags twice
 ** Set tags after starting a task for the second time
 * Done
+** DONE Crash when trying to end a task that doesn't exist
 ** DONE Fix non existant file errors

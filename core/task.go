@@ -100,13 +100,15 @@ func ClockOut(taskNames []string, timeStampValue time.Time) (endErrors []error) 
 	taskRecords := ReadTasksFromTasksFile()
 	for _, taskName := range taskNames {
 		task := taskRecords.Record[taskName]
-
-		if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime != NIL_TIME {
+		if task == nil {
+			endError := errors.New("Task " + taskName + " does not exist")
+			endErrors = append(endErrors, endError)
+			continue
+		} else if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime != NIL_TIME {
 			endError := errors.New("Task " + taskName + " is not active")
 			endErrors = append(endErrors, endError)
-		}
-
-		if timeStampValue.Before(task.TaskIntervals[len(task.TaskIntervals)-1].StartTime) {
+			continue
+		} else if timeStampValue.Before(task.TaskIntervals[len(task.TaskIntervals)-1].StartTime) {
 			endError := errors.New("Cannot end task " + taskName + " before it started")
 			endErrors = append(endErrors, endError)
 		}

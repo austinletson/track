@@ -1,9 +1,6 @@
 Features for Track 
 * Features for version 0.1.0
-** Allow support for starting and ending multiple tasks at a time
-** Generate better commandline help (cmd/)
-*** Gantt
-*** List
+** Change the display of time in the yaml file
 ** Sort entries in display functions by something
 ** Impliment Cobra (cmd/)
 *** DONE Initial implimentation
@@ -11,7 +8,7 @@ Features for Track
 *** Make sure safe input
 ** Clean up display.go
 ** Clean up task.go
-** Change the display of time in the yaml file
+** Test categories functionality
 * Next Version
 ** Choose time period for graph and list
 *** Make chart reports max daily
@@ -40,6 +37,7 @@ Features for Track
 ** End --all
 ** Provide a -s flag to sort the list command by certain things (tag, time)
 ** Support for deleting tasks
+** Standardize error messages
 * Stretch
 ** Make a command to open your config file in your editor
 ** Auto Complete (cmd)
@@ -47,6 +45,7 @@ Features for Track
 ** Guess categories based on task name (task)
 ** Notifications (unknown package)
 * Done
+** DONE Allow support for starting and ending multiple tasks at a time
 ** DONE Allow piping of arbitrary text into Track (fileIO.go)
 ** DONE Tags (task.go)
 *** DONE Basic tags
