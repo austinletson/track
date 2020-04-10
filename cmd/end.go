@@ -27,13 +27,12 @@ import (
 // endCmd represents the end command
 var endCmd = &cobra.Command{
 	Use:   "end",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Ends an active tasks",
+	Long: `Start is used to end an active task(s). By default the task(s) end at the current time, however the user can provide a time with the --time flag. Here are a few examples of what end can do:
 
-Cobrr is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	task end bugs (ends active task bugs)
+	task end mobile_research -t 15:04 (ends active task mobile_research at 15:04)
+	task end bugs mobile_research (ends tasks bugs and mobile_research at the current time)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			fmt.Print(cmd.Usage())

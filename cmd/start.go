@@ -13,11 +13,12 @@ import (
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Starts a task(s)",
-	Long: `Start is used to start a new or existing task or tasks. By default the task(s) starts at the current time, however the user can provide a time with the --time flag. Below are a few examples of what start can do:
+	Long: `Start is used to start a new or existing inactive task(s). By default the task(s) starts at the current time, however the user can provide a time with the --time flag. Here are a few examples of what start can do:
 
-	task start bugs (starts a task called \"bugs\" at the current time)
-	task start mobile_research -t 15:35 (starts a task called \" mobile_research\" at 15:35)
-	task start bugs mobile_research (starts tasks \"bugs\" and \"mobile_research\" at the current time)`,
+	task start bugs (starts a task bugs at the current time)
+	task start mobile_research -t 15:04 (starts a task mobile_research at 15:04)
+	task start bugs mobile_research (starts tasks bugs and mobile_research at the current time)
+	task start retro -g "team, meeting" (starts a task with tags team and meeting)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			fmt.Print(cmd.Usage())
