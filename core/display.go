@@ -45,6 +45,8 @@ func ListTasks(taskRecords TaskRecords, allOrActive bool, verboseOrNot bool, tag
 		}
 		tasks = taggedTasks
 	}
+
+	tasks = sortTasksByTime(tasks)
 	if verboseOrNot {
 		taskString = generateBasicReport(tasks)
 	} else {
@@ -170,7 +172,13 @@ func GenerateGanttChart(records TaskRecords) (chart string) {
 	//totalLength := ganttGraphLength + maxNameLength + headShift
 	chart = ""
 
+	// Convert map to slice and sort tasks
+	tasks := []Task{}
 	for _, task := range records.Record {
+		tasks = append(tasks, *task)
+	}
+	tasks = sortTasksByTime(tasks)
+	for _, task := range tasks {
 		var lineString string
 		var lineStringHeadOffset int
 		if (maxNameLength - len(task.Name)) > 13 {

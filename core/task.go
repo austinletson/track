@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"sort"
 	"time"
 )
 
@@ -140,4 +141,31 @@ func containsTask(s []Task, e Task) bool {
 		}
 	}
 	return false
+}
+
+func sortTasksByTime(tasks []Task) []Task {
+	activeTasks := []Task{}
+	inactiveTasks := []Task{}
+	for _, task := range tasks {
+		if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime == NIL_TIME {
+			activeTasks = append(activeTasks, task)
+		} else {
+			inactiveTasks = append(inactiveTasks, task)
+		}
+	}
+
+	sort.Slice(activeTasks, func(i, j int) bool {
+		timeI := activeTasks[i].TaskIntervals[len(activeTasks[i].TaskIntervals)-1]
+		timeJ := activeTasks[j].TaskIntervals[len(activeTasks[j].TaskIntervals)-1]
+
+		return timeI.StartTime.After(timeJ.StartTime)
+	})
+	sort.Slice(inactiveTasks, func(i, j int) bool {
+		timeI := inactiveTasks[i].TaskIntervals[len(inactiveTasks[i].TaskIntervals)-1]
+		timeJ := inactiveTasks[j].TaskIntervals[len(inactiveTasks[j].TaskIntervals)-1]
+
+		return timeI.EndTime.After(timeJ.EndTime)
+	})
+
+	return append(activeTasks, inactiveTasks...)
 }
