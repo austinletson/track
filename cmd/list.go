@@ -20,7 +20,7 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		trimmedTags := []string{}
-		for _, tag := range tagsFlag {
+		for _, tag := range tagsFlagList {
 			trimmedTags = append(trimmedTags, strings.Trim(tag, " "))
 		}
 		taskRecord := core.ReadTasksFromTasksFile()
@@ -33,12 +33,12 @@ var listCmd = &cobra.Command{
 
 var allFlag bool
 var verboseFlag bool
-var tagsFlag []string
+var tagsFlagList []string
 
 func init() {
 	rootCmd.AddCommand(listCmd)
 
 	listCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "Lists all tasks")
 	listCmd.Flags().BoolVarP(&verboseFlag, "verbose", "v", false, "Displays verbose list of tasks")
-	listCmd.Flags().StringSliceVarP(&tagsFlag, "tags", "t", nil, "Takes a list of tags to list. If no option is given, all tags are shown.")
+	listCmd.Flags().StringSliceVarP(&tagsFlagList, "tags", "g", nil, "Takes a list of tags to list. If no option is given, all tags are shown.")
 }

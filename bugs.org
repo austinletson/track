@@ -14,5 +14,6 @@ Bugs to be fixed to stay on Track
 ** That command is not active vs that command does not exist (list command
 errors)
 ** Disallow setting tags twice
+** Set tags after starting a task for the second time
 * Done
 ** DONE Fix non existant file errors

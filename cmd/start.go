@@ -36,7 +36,7 @@ var startCmd = &cobra.Command{
 		}
 		tasks := []core.Task{}
 		for _, taskName := range args {
-			tasks = append(tasks, core.MakeTask(taskName, priorityFlag, tagsFlag))
+			tasks = append(tasks, core.MakeTask(taskName, priorityFlag, tagsFlagStart))
 		}
 		errs := core.ClockIn(tasks, startTime)
 
@@ -48,11 +48,12 @@ var startCmd = &cobra.Command{
 
 var priorityFlag int
 var timeFlagStart string
+var tagsFlagStart []string
 
 func init() {
 	rootCmd.AddCommand(startCmd)
 
 	startCmd.Flags().IntVarP(&priorityFlag, "priority", "p", 0, "Assign a priority to the given task")
 	startCmd.Flags().StringVarP(&timeFlagStart, "time", "t", "", "Change the start time of the given task")
-	//listCmd.Flags().StringSliceVarP(&tagsFlag, "tags", "t", nil, "Takes a list of the tags to attach to the given task.")
+	startCmd.Flags().StringSliceVarP(&tagsFlagStart, "tags", "g", nil, "Takes a list of the tags to attach to the given task")
 }
