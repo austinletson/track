@@ -1,10 +1,7 @@
 Features for Track 
 * Features for version 0.1.0
 ** Change the display of time in the yaml file
-** Clean up display.go
-** Clean up task.go
-** Test categories functionality
-** WORKING Create update categories function in task.go
+** Clean up display.go (Already cleaned up to Gantt chart stuff)
 * Next Version
 ** Choose time period for graph and list
 *** Make chart reports max daily
@@ -35,6 +32,7 @@ Features for Track
 ** Provide a -s flag to sort the list command by certain things (tag, time)
 ** Support for deleting tasks
 ** Standardize error messages
+** Add "Task" command to edit and deal with tasks. 'track task task1' will display information relevant to task1
 * Stretch
 ** Make a command to open your config file in your editor
 ** Auto Complete (cmd)

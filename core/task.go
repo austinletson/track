@@ -28,16 +28,6 @@ type TaskInterval struct {
 	EndTime   time.Time
 }
 
-type TaskStartStamp struct {
-	Task       Task
-	TimeStamp  time.Time
-	StartOrEnd int
-}
-
-type TaskEndStamp struct {
-	TimeStamp time.Time
-}
-
 type TaskRecords struct {
 	Record map[string]*Task
 }
@@ -107,9 +97,7 @@ func ClockIn(taskRecords TaskRecords, taskName string, timeStampValue time.Time)
 	return taskRecords, nil
 }
 
-// Mabeu consolidate this function
 // Function to end a task that has already been started
-// TODO figure out weird behavior with task lastInterval
 func ClockOut(taskRecords TaskRecords, taskName string, timeStampValue time.Time) (records TaskRecords, endError error) {
 	task := taskRecords.Record[taskName]
 	if task == nil {
@@ -148,6 +136,7 @@ func containsTask(s []Task, e Task) bool {
 	return false
 }
 
+// Sorts tasks first by active/inactive and then by last activity
 func sortTasksByTime(tasks []Task) []Task {
 	activeTasks := []Task{}
 	inactiveTasks := []Task{}

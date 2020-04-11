@@ -65,11 +65,13 @@ func generateBasicReport(tasks []Task) (report string) {
 	maxNameAndTagsLength := 0
 	for _, task := range tasks {
 		currentNameAndTagsLength := 0
+
 		for _, tag := range task.Tags {
 			currentNameAndTagsLength += len(tag)
 			//for the two '<' '>' around the tag and the space
 			currentNameAndTagsLength += 3
 		}
+
 		currentNameAndTagsLength += len(task.Name)
 		if currentNameAndTagsLength < maxNameAndTagsLength {
 			maxNameAndTagsLength = currentNameAndTagsLength
@@ -91,32 +93,25 @@ func generateBasicReport(tasks []Task) (report string) {
 			}
 		}
 		namePrefix += "]"
+
 		var timeString string
-		firstOne := true
-		//Iterate over the intervals in reverse
+		// If task is active the first line of time string is green and on the top line
+		if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime == NIL_TIME {
+			timeString = generateCharacters(" ", maxNameAndTagsLength-prefixLength)
+			// TODO make this not specific to the current time format
+			startTimeString := task.TaskIntervals[len(task.TaskIntervals)-1].StartTime.Format(timeLayout)
+			timeString += color.New(color.FgGreen).Sprintf("%v ------->\n", startTimeString)
+		} else {
+			timeString = "\n"
+		}
+		//Iterate over rest of the intervals in reverse
 		for i := len(task.TaskIntervals) - 1; i >= 0; i-- {
 			startTime := task.TaskIntervals[i].StartTime.Format(timeLayout)
 			endTime := task.TaskIntervals[i].EndTime.Format(timeLayout)
 
-			if firstOne {
-				if task.TaskIntervals[i].EndTime == NIL_TIME {
-					timeString = generateCharacters(" ", maxNameAndTagsLength-prefixLength)
-				} else {
-
-					timeString = "\n" + timeString + generateCharacters(" ", 4)
-
-				}
-				firstOne = false
-			} else {
-				// +2 for two brackets and -4 to make it less indented
-				timeString = timeString + generateCharacters(" ", 4)
-			}
-			if task.TaskIntervals[i].EndTime == NIL_TIME {
-				// TODO make this not specific to the current time format
-				timeString += color.New(color.FgGreen).Sprintf("%v ------->\n", startTime)
-			} else {
-				timeString += fmt.Sprintf("%v -- %v\n", startTime, endTime)
-			}
+			// +2 for two brackets and -4 to make it less indented
+			timeString += generateCharacters(" ", 4)
+			timeString += fmt.Sprintf("%v -- %v\n", startTime, endTime)
 
 		}
 
