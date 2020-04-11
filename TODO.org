@@ -1,17 +1,14 @@
 Features for Track 
 * Features for version 0.1.0
 ** Change the display of time in the yaml file
-** Sort entries in display functions by something
-** Impliment Cobra (cmd/)
-*** DONE Initial implimentation
-*** Fill in help messages
-*** Make sure safe input
 ** Clean up display.go
 ** Clean up task.go
 ** Test categories functionality
+** WORKING Create update categories function in task.go
 * Next Version
 ** Choose time period for graph and list
 *** Make chart reports max daily
+** Start and end tasks based on category
 ** Allow for different time formats
 ** Make all errors elegant
 ** Reports (reports.go)
@@ -45,6 +42,7 @@ Features for Track
 ** Guess categories based on task name (task)
 ** Notifications (unknown package)
 * Done
+** DONE Sort entries in display functions by something
 ** DONE Allow support for starting and ending multiple tasks at a time
 ** DONE Allow piping of arbitrary text into Track (fileIO.go)
 ** DONE Tags (task.go)
@@ -55,3 +53,7 @@ Features for Track
 ** DONE Integrate priority into display
 ** DONE Plain text tasks storage
 ** DONE Create graph layout
+** DONE Impliment Cobra (cmd/)
+*** DONE Initial implimentation
+*** DONE Fill in help messages
+*** DONE Make sure safe input

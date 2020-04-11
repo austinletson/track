@@ -27,7 +27,7 @@ import (
 // endCmd represents the end command
 var endCmd = &cobra.Command{
 	Use:   "end",
-	Short: "Ends an active tasks",
+	Short: "Ends an active task(s)",
 	Long: `Start is used to end an active task(s). By default the task(s) end at the current time, however the user can provide a time with the --time flag. Here are a few examples of what end can do:
 
 	task end bugs (ends active task bugs)
@@ -35,7 +35,7 @@ var endCmd = &cobra.Command{
 	task end bugs mobile_research (ends tasks bugs and mobile_research at the current time)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			fmt.Print(cmd.Usage())
+			cmd.Usage()
 			return
 		}
 		var endTime time.Time
@@ -50,14 +50,15 @@ var endCmd = &cobra.Command{
 		} else {
 			endTime = time.Now()
 		}
-		taskNames := []string{}
+		taskRecords := core.ReadTasksFromTasksFile()
 		for _, taskName := range args {
-			taskNames = append(taskNames, taskName)
+			var err error
+			taskRecords, err = core.ClockOut(taskRecords, taskName, endTime)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
-		errs := core.ClockOut(taskNames, endTime)
-		for _, err := range errs {
-			fmt.Println(err)
-		}
+		core.WriteTasksToTaskFile(taskRecords)
 	},
 }
 

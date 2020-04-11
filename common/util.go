@@ -1,6 +1,9 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func IsError(err error) bool {
 	if err != nil {
@@ -16,4 +19,11 @@ func ContainsString(str string, strs []string) bool {
 		}
 	}
 	return false
+}
+
+func TrimList(stringList []string) (trimmedStrings []string) {
+	for _, str := range stringList {
+		trimmedStrings = append(trimmedStrings, strings.Trim(str, " "))
+	}
+	return trimmedStrings
 }

@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/austinletson/track/common"
 	"github.com/austinletson/track/core"
 	"github.com/spf13/cobra"
 )
@@ -19,14 +19,10 @@ var listCmd = &cobra.Command{
 	track list --all --verbose --tags="bugs, features" (lists all the tasks with tags 'bugs' and 'features.' Verbose gives extra information)`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		trimmedTags := []string{}
-		for _, tag := range tagsFlagList {
-			trimmedTags = append(trimmedTags, strings.Trim(tag, " "))
-		}
+		trimmedTags := common.TrimList(tagsFlagList)
 		taskRecord := core.ReadTasksFromTasksFile()
 
 		taskList := core.ListTasks(taskRecord, allFlag, verboseFlag, trimmedTags)
-
 		fmt.Print(taskList)
 	},
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/austinletson/track/common"
 	"github.com/austinletson/track/core"
 	"github.com/jinzhu/now"
 	"github.com/spf13/cobra"
@@ -21,29 +22,34 @@ var startCmd = &cobra.Command{
 	task start retro -g "team, meeting" (starts a task with tags team and meeting)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			fmt.Print(cmd.Usage())
+			cmd.Usage()
 			return
 		}
+
+		trimmedFlags := common.TrimList(tagsFlagStart)
+
 		var startTime time.Time
 		if timeFlagStart != "" {
 			startTimeParsed, err := now.Parse(timeFlagStart)
 			startTime = startTimeParsed
-
 			if err != nil {
 				fmt.Print(err)
 			}
 		} else {
 			startTime = time.Now()
 		}
-		tasks := []core.Task{}
-		for _, taskName := range args {
-			tasks = append(tasks, core.MakeTask(taskName, priorityFlag, tagsFlagStart))
-		}
-		errs := core.ClockIn(tasks, startTime)
 
-		for _, err := range errs {
-			fmt.Println(err)
+		taskRecords := core.ReadTasksFromTasksFile()
+		for _, taskName := range args {
+			taskRecords = core.UpdateTask(taskRecords, taskName, priorityFlag, trimmedFlags)
+
+			var startErr error
+			taskRecords, startErr = core.ClockIn(taskRecords, taskName, startTime)
+			if startErr != nil {
+				fmt.Println(startErr)
+			}
 		}
+		core.WriteTasksToTaskFile(taskRecords)
 	},
 }
 

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"sort"
 	"time"
+
+	"github.com/austinletson/track/common"
 )
 
 const (
@@ -51,73 +53,76 @@ func MakeTask(name string, priority int, tags []string) (task Task) {
 	return task
 }
 
-// Function to start a task and write it to file
-func ClockIn(taskValues []Task, timeStampValue time.Time) (startErrors []error) {
-	taskRecords := ReadTasksFromTasksFile()
+func UpdateTask(taskRecords TaskRecords, name string, priority int, tags []string) TaskRecords {
 	if taskRecords.Record == nil {
 		taskRecords.Record = make(map[string]*Task)
 	}
-	for _, taskValue := range taskValues {
-		if task, ok := taskRecords.Record[taskValue.Name]; ok {
-			lastInterval := task.TaskIntervals[len(task.TaskIntervals)-1]
-			if lastInterval.EndTime == NIL_TIME {
-				startError := errors.New("Task " + task.Name + " already active")
-				startErrors = append(startErrors, startError)
-				continue
-			}
-			if len(task.TaskIntervals) > 1 {
-				lastTimeStamp := task.TaskIntervals[len(task.TaskIntervals)-1].EndTime
-				if timeStampValue.Before(lastTimeStamp) {
-					startError := errors.New("Cannot start task " + task.Name + " before the end of the last time interval")
-					startErrors = append(startErrors, startError)
-					continue
-				}
-			}
-			newInterval := TaskInterval{
-				StartTime: timeStampValue,
-				EndTime:   NIL_TIME,
-			}
-			task.TaskIntervals = append(task.TaskIntervals, newInterval)
-
-		} else { // If the task doesn't exist in the record
-			taskInterval := TaskInterval{
-				StartTime: timeStampValue,
-				EndTime:   NIL_TIME,
-			}
-			taskValue.TaskIntervals = append(taskValue.TaskIntervals, taskInterval)
-			// Make a copy because of for loop pointer behavior
-			taskValueNew := taskValue
-			taskRecords.Record[taskValue.Name] = &taskValueNew
+	if taskRecords.Record[name] == nil {
+		newTask := MakeTask(name, priority, tags)
+		taskRecords.Record[name] = &newTask
+		return taskRecords
+	}
+	existingTags := taskRecords.Record[name].Tags
+	newTags := []string{}
+	for _, tag := range tags {
+		if !common.ContainsString(tag, existingTags) {
+			newTags = append(newTags, tag)
 		}
 	}
-	WriteTasksToTaskFile(taskRecords)
-	return startErrors
+	taskRecords.Record[name].Tags = append(existingTags, newTags...)
+	taskRecords.Record[name].Priority = priority
+	return taskRecords
+}
+
+// Function to start a task and write it to file
+func ClockIn(taskRecords TaskRecords, taskName string, timeStampValue time.Time) (newTaskRecords TaskRecords, startError error) {
+	taskValue := taskRecords.Record[taskName]
+
+	if taskRecords.Record[taskValue.Name].TaskIntervals != nil {
+		task := taskRecords.Record[taskValue.Name]
+		lastInterval := task.TaskIntervals[len(task.TaskIntervals)-1]
+		if lastInterval.EndTime == NIL_TIME {
+			return taskRecords, errors.New("Task " + task.Name + " already active")
+		}
+		if len(task.TaskIntervals) > 1 {
+			lastTimeStamp := task.TaskIntervals[len(task.TaskIntervals)-1].EndTime
+			if timeStampValue.Before(lastTimeStamp) {
+				return taskRecords, errors.New("Cannot start task " + task.Name + " before the end of the last time interval")
+			}
+		}
+		newInterval := TaskInterval{
+			StartTime: timeStampValue,
+			EndTime:   NIL_TIME,
+		}
+		task.TaskIntervals = append(task.TaskIntervals, newInterval)
+
+	} else { // If the task doesn't exist in the record
+		taskInterval := TaskInterval{
+			StartTime: timeStampValue,
+			EndTime:   NIL_TIME,
+		}
+		taskValue.TaskIntervals = append(taskValue.TaskIntervals, taskInterval)
+		taskRecords.Record[taskValue.Name] = taskValue
+	}
+	return taskRecords, nil
 }
 
 // Mabeu consolidate this function
 // Function to end a task that has already been started
 // TODO figure out weird behavior with task lastInterval
-func ClockOut(taskNames []string, timeStampValue time.Time) (endErrors []error) {
-	taskRecords := ReadTasksFromTasksFile()
-	for _, taskName := range taskNames {
-		task := taskRecords.Record[taskName]
-		if task == nil {
-			endError := errors.New("Task " + taskName + " does not exist")
-			endErrors = append(endErrors, endError)
-			continue
-		} else if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime != NIL_TIME {
-			endError := errors.New("Task " + taskName + " is not active")
-			endErrors = append(endErrors, endError)
-			continue
-		} else if timeStampValue.Before(task.TaskIntervals[len(task.TaskIntervals)-1].StartTime) {
-			endError := errors.New("Cannot end task " + taskName + " before it started")
-			endErrors = append(endErrors, endError)
-		}
-
-		task.TaskIntervals[len(task.TaskIntervals)-1].EndTime = timeStampValue
+func ClockOut(taskRecords TaskRecords, taskName string, timeStampValue time.Time) (records TaskRecords, endError error) {
+	task := taskRecords.Record[taskName]
+	if task == nil {
+		return taskRecords, errors.New("Task " + taskName + " does not exist")
+	} else if task.TaskIntervals[len(task.TaskIntervals)-1].EndTime != NIL_TIME {
+		return taskRecords, errors.New("Task " + taskName + " is not active")
+	} else if timeStampValue.Before(task.TaskIntervals[len(task.TaskIntervals)-1].StartTime) {
+		return taskRecords, errors.New("Cannot end task " + taskName + " before it started")
 	}
-	WriteTasksToTaskFile(taskRecords)
-	return endErrors
+
+	task.TaskIntervals[len(task.TaskIntervals)-1].EndTime = timeStampValue
+	taskRecords.Record[taskName] = task
+	return taskRecords, endError
 }
 
 // Helper methods
