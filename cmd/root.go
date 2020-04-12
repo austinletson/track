@@ -37,7 +37,7 @@ var rootCmd = &cobra.Command{
 	Use:   "track",
 	Short: "Track is a minimalist task and event management tool",
 	Long: core.GenerateLogo() + `
-Trakck is a minimalist task and event management tool. 
+Track is a minimalist task and event management tool. 
 
 Track supports starting and ending events and tasks in real time to increase productivity and organize thought.
 You can categorize and prioritize tasks as well as log previously completed tasks.
