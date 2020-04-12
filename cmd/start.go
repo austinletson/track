@@ -61,6 +61,6 @@ func init() {
 	rootCmd.AddCommand(startCmd)
 
 	startCmd.Flags().IntVarP(&priorityFlag, "priority", "p", 0, "Assign a priority to the given task")
-	startCmd.Flags().StringVarP(&timeFlagStart, "time", "t", "", "Change the start time of the given task")
+	startCmd.Flags().StringVarP(&timeFlagStart, "time", "t", "", "Change the start time of the given task. Format 15:04.")
 	startCmd.Flags().StringSliceVarP(&tagsFlagStart, "tags", "g", nil, "Takes a list of the tags to attach to the given task")
 }

@@ -8,7 +8,6 @@ import (
 func main() {
 	pipedInput := getStdin()
 	if pipedInput != "" {
-
 		core.TakeNote(pipedInput, core.GetActiveTasks(core.ReadTasksFromTasksFile()))
 	}
 	cmd.Execute()

@@ -67,5 +67,5 @@ var timeFlagEnd string
 func init() {
 	rootCmd.AddCommand(endCmd)
 
-	endCmd.Flags().StringVarP(&timeFlagEnd, "time", "t", "", "Change the time of a given command")
+	endCmd.Flags().StringVarP(&timeFlagEnd, "time", "t", "", "Change the time of a given command. Format 15:04")
 }

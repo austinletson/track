@@ -241,13 +241,13 @@ func GenerateGanttChart(records TaskRecords) (chart string) {
 	}
 	//footer := "#" + generateCharacters("#", totalLength-2) + "#"
 	//	chart = chart + foot
-	shiftedHeader := " " + generateLogo() + generateCharacters(" ", maxNameLength+headShift-13) + generateChartHeader(minTime, maxTime, ganttGraphLength)
+	shiftedHeader := " " + GenerateLogo() + generateCharacters(" ", maxNameLength+headShift-13) + generateChartHeader(minTime, maxTime, ganttGraphLength)
 	return shiftedHeader + Bold(chart)
 
 }
 
-func generateLogo() (logo string) {
-	logo = color.New(color.FgBlack, color.BgHiWhite).Sprint(Bold("===")) + color.New(color.FgHiRed, color.BgHiWhite).Sprint((Bold("track"))) + color.New(color.FgBlack, color.BgHiWhite).Sprint(Bold("===")) + " "
+func GenerateLogo() (logo string) {
+	logo = color.New(color.FgBlack, color.BgHiWhite).Sprint(Bold("===")) + color.New(color.FgHiRed, color.BgHiWhite).Sprint((Bold("Track"))) + color.New(color.FgBlack, color.BgHiWhite).Sprint(Bold("===")) + " "
 	return logo
 }
 
@@ -280,20 +280,20 @@ func generateCharacters(character string, count int) (characters string) {
 	return characters
 }
 
-// Return min and max of slice of times
-func timeSpan(times []time.Time) (min time.Time, max time.Time, containsNileTime bool) {
+// Return non-nil min and max of slice of times and whether there was a nil time
+func timeSpan(times []time.Time) (min time.Time, max time.Time, containsNilTime bool) {
 	min = times[0]
 	max = times[0]
 	for _, time := range times {
 		if time == NIL_TIME {
-			containsNileTime = true
+			containsNilTime = true
 		} else if time.Before(min) {
 			min = time
 		} else if time.After(max) {
 			max = time
 		}
 	}
-	return min, max, containsNileTime
+	return min, max, containsNilTime
 }
 
 // Returns the scalled numerator of how far between max and min the middle time lies

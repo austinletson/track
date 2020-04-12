@@ -1,21 +1,18 @@
 Bugs to be fixed to stay on Track
 * Critical
-** Disallow starting the same tag twice (or other weird tag behavior)
-** Gantt Chart
+* Secondary
+** Gantt chart
 *** Eleminate extended space for active tasks on gantt chart
 *** Fix Gantt chart so that all the elements line up
 *** Fix timeline for Gantt chart so that it goes to present time if there is an on going task
 *** When adding a new time interval that is before current time intervals, the interval doesnt showup on the report
-* Secondary
-** Gantt chart
 *** Non bold/cyan pipe on Gantt chart edge case
 *** Handle edge case with short intervals gracefully
 *** Order of display for list and chart
 ** Add ability to start and end tasks between previous tasks
-** That command is not active vs that command does not exist (list command
-errors)
-** Disallow setting tags twice
-** Set tags after starting a task for the second time
+** That command is not active vs that command does not exist (list command errors)
 * Done
 ** DONE Crash when trying to end a task that doesn't exist
 ** DONE Fix non existant file errors
+** DONE Disallow starting the same tag twice (or other weird tag behavior)
+** DONE Set tags after starting a task for the second time
